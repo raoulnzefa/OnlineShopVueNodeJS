@@ -13,7 +13,7 @@
             flex-col
             p-6
             border-2 border-gray-400
-            h-96
+            h-60
             rounded
             m-3
             cursor-pointer
@@ -31,9 +31,8 @@
           <h2 class="text-blue-500 font-bold text-md">
             {{ product.productStock }} in Stock
           </h2>
-          <p class="text-center">{{ product.productDescription }}</p>
           <h1 class="text-green-700 font-bold text-xl">
-            ${{ product.productSellPrice }}
+            $MXN {{ product.productSellPrice }}
           </h1>
         </router-link>
       </ul>

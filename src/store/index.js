@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import { auth } from './modules/Auth'
+import {products} from './modules/Products'
 
 
 
@@ -15,7 +16,8 @@ const store = createStore({
       }
     },
     modules:{
-        auth
+        auth,
+        products
     }
   })
 

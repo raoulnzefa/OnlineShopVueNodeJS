@@ -8,6 +8,7 @@ import AuthPage from '../pages/AuthPage'
 import auth from '../middleware/auth'
 import Products from '../pages/Products'
 import Product from '../pages/Product'
+import Payment from '../pages/Payment'
 
 const routes = [
     {path:'/',name:'home',component:Home},
@@ -17,6 +18,7 @@ const routes = [
     {path:'/products',name:'products',component:Products},
     {path: '/product/:productname', component: Product },
     {path: '/products/:category', component: Products },
+    {path: '/payment', component: Payment },
     
 ]
 

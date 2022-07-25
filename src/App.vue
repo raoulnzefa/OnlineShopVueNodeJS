@@ -19,7 +19,19 @@ export default {
                 }
         }
      },
+     beforeCreate(){
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    
+        
+      if(cart == null) {
+        cart = localStorage.setItem("cart", JSON.stringify([]));
+      }
+      
+     },
   mounted() {
+    
+
+
     window.setInterval(()=>{
         const user = localStorage.getItem('user');
         if(user != null){

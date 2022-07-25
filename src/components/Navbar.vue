@@ -23,39 +23,46 @@
                 border-opacity-25 border
                 bg-gray-100
                 invisible
-                border-t-0
-                border-gray-800
+                border-t-0 border-gray-800
                 w-60
                 absolute
                 -left-3
                 top-full
                 transition-all
                 opacity-0
-                group-hover:visible
-                group-hover:opacity-100
+                group-hover:visible group-hover:opacity-100
               "
             >
               <ul class="py-1">
                 <li>
-                  <router-link to="/products"  class="block px-4 py-2 hover:bg-gray-200">
+                  <router-link
+                    to="/products"
+                    class="block px-4 py-2 hover:bg-gray-200"
+                  >
                     All Products
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/products/shirts" class="block px-4 py-2 hover:bg-gray-200">
+                  <router-link
+                    to="/products/shirts"
+                    class="block px-4 py-2 hover:bg-gray-200"
+                  >
                     Shirts
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/products/pants" class="block px-4 py-2 hover:bg-gray-200">
+                  <router-link
+                    to="/products/pants"
+                    class="block px-4 py-2 hover:bg-gray-200"
+                  >
                     Pants
                   </router-link>
                 </li>
               </ul>
             </nav>
           </div>
-          <router-link to="/" class="md:hidden">LOGO TIENDA</router-link>
-          <div @click="showMenu = !showMenu" class="flex md:hidden">
+          <router-link to="/" class="pl-5 md:hidden">LOGO TIENDA</router-link>
+          <div @click="showMenu = !showMenu" class="pr-5 flex md:hidden">
             <button
               type="button"
               class="
@@ -127,9 +134,10 @@
               hover:bg-gray-300
               text-gray-800
               hover:text-blue-400
+              md:hidden
             "
-            to="/login"
-            >product1</router-link
+            to="/products/shirts"
+            >Shirts</router-link
           >
 
           <router-link
@@ -148,9 +156,10 @@
               hover:bg-gray-300
               text-gray-800
               hover:text-blue-400
+              md:hidden
             "
-            to="/login"
-            >product2</router-link
+            to="/products/pants"
+            >Pants</router-link
           >
 
           <router-link
@@ -214,24 +223,127 @@
             Logout
           </button>
 
-          <button
-            class="
-              text-sm
-              w-full
-              rounded
-              p-4
-              h-10
-              flex
-              items-center
-              md:w-auto
-              font-bold
-              hover:bg-gray-300
-              text-gray-800
-              hover:text-blue-400
-            "
-          >
-            Cart
-          </button>
+          <div class="hidden md:block group relative">
+            <button
+              class="
+                text-sm
+                w-full
+                rounded
+                p-4
+                h-10
+                flex
+                items-center
+                md:w-auto
+                font-bold
+                hover:bg-gray-300
+                text-gray-800
+                hover:text-blue-400
+              "
+            >
+              <font-awesome-icon size="xl" icon="cart-shopping" />
+            </button>
+
+            <div
+              tabindex="0"
+              class="
+                border-opacity-25 border
+                rounded-md
+                bg-gray-100
+                invisible
+                border-gray-800
+                w-96
+                absolute
+                -right-4
+                top-full
+                transition-all
+                opacity-0
+                group-hover:visible group-hover:opacity-100
+                max-h-96
+                h-96
+                overflow-y-scroll
+                flex
+                flex-col
+              "
+            >
+              <ul v-if="cart.length > 0" class="py-1">
+                <li
+                  v-for="(product, index) in cart"
+                  :index="index"
+                  class="flex h-32 p-4 hover:bg-gray-200"
+                  :key="product.productID"
+                >
+                  <img
+                    @click="showProducts"
+                    class="w-2/6 object-contain rounded"
+                    :src="product.productImage"
+                    :alt="product.productName"
+                  />
+                  <div class="flex flex-col w-full p-3">
+                    <div class="flex justify-between w-full">
+                      <h1 class="w-full">{{ product.productName }}</h1>
+                      <button @click="removeFromCart(product.productID)">
+                        <font-awesome-icon size="xl" icon="xmark" />
+                      </button>
+                    </div>
+                    <h1 class="font-bold">${{ product.productSellPrice }}</h1>
+                    <div
+                      class="
+                        h-16
+                        w-2/5
+                        rounded-2xl
+                        flex
+                        justify-between
+                        items-center
+                        bg-white
+                      "
+                    >
+                      <button
+                        @click="minusOneProduct(index)"
+                        class="w-1/3 h-full bg-gray-300 rounded-l-2xl"
+                      >
+                        -
+                      </button>
+                      <div class="text-sm">
+                        {{ product.quantity }}
+                      </div>
+
+                      <button
+                        @click="sumOneProduct(index)"
+                        class="w-1/3 h-full bg-gray-300 rounded-r-2xl"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </li>
+                <h1 class="font-bold text-xl relative bottom-0 text-right m-5">
+                  Subtotal:${{ subtotalPrice }}
+                </h1>
+                
+              </ul>
+              
+              <h1 class="font-bold text-2xl text-center m-10" v-else>
+                Your cart is empty
+              </h1>
+              <button
+                  @click="redirectToPayment"
+                  class="
+                    border border-blue-500
+                    hover:bg-blue-700
+                    w-11/12
+                    text-blue-500
+                    font-bold
+                    py-2
+                    px-4
+                    rounded
+                    self-center
+                    my-5
+                  "
+                >
+                  Finish Order
+                </button>
+            </div>
+          </div>
         </ul>
       </nav>
     </div>
@@ -241,25 +353,137 @@
 <script>
 /* eslint-disable */
 import store from "../store";
+import axios from 'axios'
 export default {
   name: "Navbar",
   data() {
     return {
       showMenu: false,
       isProductsDisplayed: false,
+      cart: [],
+      stripe:{},
+      items:[]
     };
+  },
+  mounted() {
+    this.cart = JSON.parse(localStorage.getItem("cart"));
+    this.$store.dispatch('products/setOrder',this.cart)
+    if (this.cart.length > 0) {
+      this.stripe = Stripe('pk_test_51LOsamDWWONqHYQMPcOfouLGpqdHT7c2igdD4QT6G7cAoSlv1lKJCK0n6BpvVgRSANAQQMNqZC1a52cmNJJWMzqk00aLaMvOJk')
+      
+    }
+    
+    window.addEventListener("foo-key-localstorage-changed", (event) => {
+      this.cart = JSON.parse(localStorage.getItem("cart"));
+      this.$store.dispatch('products/setOrder',this.cart)
+    });
   },
   computed: {
     isLogged() {
       return this.$store.getters["auth/getStatus"].loggedIn;
     },
+    subtotalPrice() {
+      var subtotal = 0;
+      this.cart.forEach((element) => {
+        const elementTotal = element.quantity * element.productSellPrice;
+        subtotal += elementTotal;
+      });
+      return subtotal.toFixed(2);
+    },
   },
   methods: {
+     redirectToPayment(){
+      const items = this.$store.getters["products/getOrder"];
+      const finalOrder = []
+       items.forEach(element=>{
+        console.log(element)
+        const item = {
+          price : element.stripePrice,
+          quantity : element.quantity
+        }
+        finalOrder.push(item)
+      })
+
+      this.stripe.redirectToCheckout({
+        successUrl:"http://localhost:8080/payment",
+        cancelUrl:"http://localhost:8080/",
+        lineItems:finalOrder,
+        mode:"payment"
+      })
+
+      localStorage.removeItem('cart')
+      this.cart = []
+      this.$store.dispatch('products/setOrder',this.cart)
+    },
+    sumOneProduct(index) {
+      const cart = localStorage.getItem("cart");
+      const JSONCart = JSON.parse(cart);
+
+      var newCart = JSONCart.map(function (element) {
+        if (
+          index == JSONCart.indexOf(element) &&
+          element.quantity < element.productStock
+        ) {
+          element.quantity += 1;
+          return element;
+        }
+        return element;
+      });
+      localStorage.removeItem("cart");
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      window.dispatchEvent(
+        new CustomEvent("foo-key-localstorage-changed", {
+          detail: {
+            storage: localStorage.getItem("foo-key"),
+          },
+        })
+      );
+    },
+    minusOneProduct(index) {
+      const cart = localStorage.getItem("cart");
+      const JSONCart = JSON.parse(cart);
+
+      var newCart = JSONCart.map(function (element) {
+        if (index == JSONCart.indexOf(element) && element.quantity > 1) {
+          element.quantity -= 1;
+          return element;
+        }
+        return element;
+      });
+      localStorage.removeItem("cart");
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      window.dispatchEvent(
+        new CustomEvent("foo-key-localstorage-changed", {
+          detail: {
+            storage: localStorage.getItem("foo-key"),
+          },
+        })
+      );
+    },
+    showProducts() {
+      console.log(this.cart);
+    },
     toggleNav: function () {
       this.showMenu = !this.showMenu;
     },
     logout() {
       store.dispatch("auth/logout");
+    },
+
+    removeFromCart(prodID) {
+      const cart = JSON.parse(localStorage.getItem("cart"));
+      const newCart = cart.filter(function (item) {
+        return item.productID !== prodID;
+      });
+      localStorage.removeItem("cart");
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      window.dispatchEvent(
+        new CustomEvent("foo-key-localstorage-changed", {
+          detail: {
+            storage: localStorage.getItem("foo-key"),
+          },
+        })
+      );
     },
   },
 };
