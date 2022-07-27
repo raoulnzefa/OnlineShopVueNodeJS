@@ -43,4 +43,11 @@ export default {
 }
 </script>
 
+<style>
+html {
+    overflow-x: hidden;
+  margin-right: calc(-1 * (100vw - 100%));
+}
+</style>
+
 

@@ -202,26 +202,72 @@
             >Register</router-link
           >
 
-          <button
-            v-if="isLogged"
-            class="
-              text-sm
-              w-full
-              rounded
-              p-4
-              h-10
-              flex
-              items-center
-              md:w-auto
-              font-bold
-              hover:bg-gray-300
-              text-gray-800
-              hover:text-blue-400
-            "
-            @click="logout"
-          >
-            Logout
-          </button>
+          
+
+            
+
+
+          <div class="hidden md:block group relative">
+            <button
+              class="
+                text-sm
+                w-full
+                rounded
+                p-4
+                h-10
+                flex
+                items-center
+                md:w-auto
+                font-bold
+                hover:bg-gray-300
+                text-gray-800
+                hover:text-blue-400
+              "
+            >
+              <font-awesome-icon size="xl" icon="circle-user" />
+            </button>
+
+            <nav
+              tabindex="0"
+              class="
+                border-opacity-25 border
+                bg-gray-100
+                invisible
+                border-t border-gray-800
+                rounded-md
+                w-40
+                absolute
+                right-auto
+                left-1/2
+                transform -translate-x-1/2 
+                top-full
+                transition-all
+                opacity-0
+                group-hover:visible group-hover:opacity-100
+              "
+            >
+              <ul class="py-1">
+                <li>
+                  <router-link
+                    to="/account/settings"
+                    class="flex justify-between items-center text-left px-4 py-2 hover:bg-gray-200"
+                  >
+                    Settings  <font-awesome-icon size="md" icon="gear" />
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/account/orders"
+                    class="flex justify-between items-center text-left px-4 py-2 hover:bg-gray-200"
+                  >
+                    Your orders  <font-awesome-icon size="md" icon="bag-shopping" />
+                  </router-link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+
 
           <div class="hidden md:block group relative">
             <button
@@ -316,6 +362,7 @@
                     </div>
                   </div>
                 </li>
+                <div class="w-10/12 bg-gray-400 h-px mx-auto"></div>
                 <h1 class="font-bold text-xl relative bottom-0 text-right m-5">
                   Subtotal:${{ subtotalPrice }}
                 </h1>
@@ -326,6 +373,7 @@
                 Your cart is empty
               </h1>
               <button
+                  v-if="subtotalPrice>0"
                   @click="redirectToPayment"
                   class="
                     border border-blue-500
@@ -337,13 +385,36 @@
                     px-4
                     rounded
                     self-center
-                    my-5
+                    
                   "
                 >
-                  Finish Order
+                  Go to checkout
                 </button>
+
+                
             </div>
+            
           </div>
+          <button
+            v-if="isLogged"
+            class="
+              text-sm
+              w-full
+              rounded
+              p-4
+              h-10
+              flex
+              items-center
+              md:w-auto
+              font-bold
+              hover:bg-gray-300
+              text-gray-800
+              hover:text-blue-400
+            "
+            @click="logout"
+          >
+            Logout
+          </button>
         </ul>
       </nav>
     </div>
@@ -370,12 +441,17 @@ export default {
     this.$store.dispatch('products/setOrder',this.cart)
     if (this.cart.length > 0) {
       this.stripe = Stripe('pk_test_51LOsamDWWONqHYQMPcOfouLGpqdHT7c2igdD4QT6G7cAoSlv1lKJCK0n6BpvVgRSANAQQMNqZC1a52cmNJJWMzqk00aLaMvOJk')
-      
+    
     }
     
     window.addEventListener("foo-key-localstorage-changed", (event) => {
       this.cart = JSON.parse(localStorage.getItem("cart"));
       this.$store.dispatch('products/setOrder',this.cart)
+      if (this.cart.length > 0) {
+      this.stripe = Stripe('pk_test_51LOsamDWWONqHYQMPcOfouLGpqdHT7c2igdD4QT6G7cAoSlv1lKJCK0n6BpvVgRSANAQQMNqZC1a52cmNJJWMzqk00aLaMvOJk')
+    
+      
+    }
     });
   },
   computed: {
@@ -393,27 +469,22 @@ export default {
   },
   methods: {
      redirectToPayment(){
-      const items = this.$store.getters["products/getOrder"];
-      const finalOrder = []
-       items.forEach(element=>{
-        console.log(element)
-        const item = {
-          price : element.stripePrice,
-          quantity : element.quantity
-        }
-        finalOrder.push(item)
-      })
+      if(this.isLogged){
+        const items = this.$store.getters["products/getOrder"];
+      
 
-      this.stripe.redirectToCheckout({
-        successUrl:"http://localhost:8080/payment",
-        cancelUrl:"http://localhost:8080/",
-        lineItems:finalOrder,
-        mode:"payment"
+      axios.post('http://localhost:5000/payment',items).then(res=>{
+        console.log(res)
+        window.location.href = res.data.url;
+        console.log(res.data.id)
       })
 
       localStorage.removeItem('cart')
       this.cart = []
       this.$store.dispatch('products/setOrder',this.cart)
+      }else{
+        this.$router.push('/login')
+      }
     },
     sumOneProduct(index) {
       const cart = localStorage.getItem("cart");

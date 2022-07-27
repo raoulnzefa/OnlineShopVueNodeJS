@@ -122,11 +122,17 @@ export default {
   name: "Product",
   data() {
     return {
-      product: [],
+      product: {},
       componentKey: 0,
       isProductInCar:false,
-      stripe:{}
+      stripe:{},
+      
     };
+  },
+  computed: {
+    isLogged() {
+      return this.$store.getters["auth/getStatus"].loggedIn;
+    },
   },
   mounted() {
      /* eslint-disable */
@@ -169,17 +175,22 @@ export default {
   },
   methods: {
     buyNow() {
-      this.stripe.redirectToCheckout({
-        successUrl:"http://localhost:8080/payment",
-        cancelUrl:"http://localhost:8080/",
-        lineItems:[{
-          price : this.product.stripePrice,
-          quantity : 1
-        },
-        ],
-          
-        mode:"payment"
+      if(this.isLogged){
+        const item = []
+        const product = {
+          quantity:1,
+          stripePrice:this.product.stripePrice
+        }
+        item.push(product)
+        axios.post('http://localhost:5000/payment',item).then(res=>{
+        console.log(res)
+        window.location.href = res.data.url;
+        console.log(res.data.id)
       })
+      }else{
+        this.$router.push('/login')
+      }
+      
     },
     addProductToCart() {
       this.isProductInCar = true;

@@ -1,7 +1,9 @@
 <template>
   <div class="flex justify-center">
-    <h1 class="font-bold text-5xl mt-5 text-center">{{page}}</h1>
-    <div class="my-20 w-10/12">
+    <h1 class="font-bold text-5xl mt-5 w-2/12 text-center">{{ page }}</h1>
+    
+    <div class="my-20 pr-5 max-w-10/12 min-w-10/12 w-10/12">
+      <button class="p-2 rounded-sm m-4 border border-gray-300" @click="changeSorting">{{priceSorting == 'ascending' ? 'Order by descending price': 'Order by ascending price'}}</button>
       <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <router-link
           class="
@@ -48,33 +50,58 @@ export default {
   data() {
     return {
       products: [],
-      page:''
+      page: "",
+      priceSorting: "descending",
     };
   },
   mounted() {
     const route = useRoute();
-    
+
     if (route.params.category == "shirts") {
-        this.page = 'Shirts'
-      axios.get("http://localhost:5000/api/products/category/Shirt").then((res) => {
-        console.log(res.data + 'asd')
-        this.products = res.data;
-      });
+      this.page = "Shirts";
+      axios
+        .get("http://localhost:5000/api/products/category/Shirt")
+        .then((res) => {
+          console.log(res.data + "asd");
+          this.products = res.data;
+        });
     } else if (route.params.category == "pants") {
-        this.page = 'Pants'
-      axios.get("http://localhost:5000/api/products/category/Pant").then((res) => {
-        this.products = res.data;
-      });
+      this.page = "Pants";
+      axios
+        .get("http://localhost:5000/api/products/category/Pant")
+        .then((res) => {
+          this.products = res.data;
+        });
     } else {
-        this.page = 'All Products'
+      this.page = "All Products";
       axios.get("http://localhost:5000/api/products").then((res) => {
         this.products = res.data;
       });
     }
   },
   methods: {
-    show() {
-      console.log(this.products);
+    changeSorting() {
+      if (this.priceSorting == "descending") {
+        this.products.sort(function (a, b) {
+          var keyA = new Date(a.productSellPrice),
+            keyB = new Date(b.productSellPrice);
+          // Compare the 2 dates
+          if (keyA < keyB) return -1;
+          if (keyA > keyB) return 1;
+          return 0;
+        });
+        this.priceSorting = "ascending";
+      } else {
+        this.products.sort(function (a, b) {
+          var keyB = new Date(a.productSellPrice),
+            keyA = new Date(b.productSellPrice);
+          // Compare the 2 dates
+          if (keyA < keyB) return -1;
+          if (keyA > keyB) return 1;
+          return 0;
+        });
+        this.priceSorting = "descending";
+      }
     },
   },
 };
