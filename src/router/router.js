@@ -9,6 +9,12 @@ import auth from '../middleware/auth'
 import Products from '../pages/Products'
 import Product from '../pages/Product'
 import Payment from '../pages/Payment'
+import VerifyEmail from '../pages/VerifyEmail'
+import VerifySent from '../pages/VerifySent'
+import AccountSettings from '../pages/AccountSettings'
+import ResetPassword from '../pages/ResetPassword'
+import ChangePassword from '../pages/ChangePassword'
+import Orders from '../pages/Orders'
 
 const routes = [
     {path:'/',name:'home',component:Home},
@@ -19,7 +25,12 @@ const routes = [
     {path: '/product/:productname', component: Product },
     {path: '/products/:category', component: Products },
     {path: '/payment', component: Payment },
-    
+    {path: '/authentication/activate/:token', component: VerifyEmail },
+    {path: '/authentication/reset-password/:token', component: ChangePassword },
+    {path: '/verify-sent', component: VerifySent },
+    {path: '/reset-password', component: ResetPassword },
+    {path: '/account/settings', component: AccountSettings,meta: { middleware: [auth] } },
+    {path: '/account/orders', component: Orders},
 ]
 
 

@@ -176,13 +176,10 @@ export default {
   methods: {
     buyNow() {
       if(this.isLogged){
-        const item = []
-        const product = {
-          quantity:1,
-          stripePrice:this.product.stripePrice
-        }
-        item.push(product)
-        axios.post('http://localhost:5000/payment',item).then(res=>{
+        const user = this.$store.getters["auth/getUser"]
+        const items = []
+        items.push(this.product);
+        axios.post('http://localhost:5000/payment',{items:items,userId:user.id}).then(res=>{
         console.log(res)
         window.location.href = res.data.url;
         console.log(res.data.id)

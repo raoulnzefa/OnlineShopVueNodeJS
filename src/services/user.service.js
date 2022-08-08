@@ -25,6 +25,7 @@ async function login(payload) {
         payload, { withCredentials: true }).then((res) => {
 
             if (res.data[0].access_token) {
+                console.log(res.data)
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(res.data[0]));
 
@@ -54,8 +55,8 @@ async function login(payload) {
 }
 
 async function register(user) {
-
-    await axios('http://localhost:5000/api/clients/auth/register', requestOptions).then(res => console.log(res));
+    console.log(user)
+    await axios.post('http://localhost:5000/api/clients/auth/verification-email', user).then(res => console.log(res));
 }
 
 async function refreshToken(res,query){

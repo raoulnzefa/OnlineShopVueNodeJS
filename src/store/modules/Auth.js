@@ -5,8 +5,8 @@ import router from '../../router/router'
 
 const user = JSON.parse(localStorage.getItem('user'));
 const state = user
-    ? { status: { loggedIn: true }, user,users:null }
-    : { status: {}, user: null };
+    ? { status: { loggedIn: true }, user,users:null,message:'' }
+    : { status: {}, user: null,message:'' };
     
 
 const getters={
@@ -15,6 +15,12 @@ const getters={
   },
   getUsers(state){
     return state.users
+  },
+  getUser(state){
+    return state.user
+  },
+  getMessage(state){
+    return state.message
   }
 }
 
@@ -29,10 +35,12 @@ const actions = {
       commit('loginRequest', payload.email);
       
         userService.login(req)
-            .then((res) => {
-                    console.log('logged')
+            .then(async (res) => {
+                    console.log(res)
                     commit('loginSuccess', res);
-                    router.push('/'); 
+                    router.go(0)
+                    
+                    
                 }).catch(error => {
                   commit('loginFailure', error);
                   // dispatch('alert/error', error, { root: true });
@@ -51,7 +59,7 @@ const actions = {
             .then(
                 client => {
                     commit('registerSuccess', client);
-                    router.push('/login');
+                    router.push('/verify-sent');
                     setTimeout(() => {
                         // display success message after route change completes
                         dispatch('alert/success', 'Registration successful', { root: true });
@@ -69,7 +77,10 @@ const actions = {
     },
     setUsers({commit},users){
       commit('setUsers', users);
-    }
+    },
+    setUser({commit},user){
+        commit('setUser', user);
+      }
     
      
    
@@ -84,8 +95,12 @@ const mutations = {
         state.status = { loggedIn: true };
         state.user = user;
     },
+    setUser(state,user){
+        state.user = user
+    },
     loginFailure(state) {
         state.status = {};
+        state.message = "Incorrect email or password"
         state.user = null;
     },
     logout(state) {
